@@ -34,6 +34,8 @@ extern unsigned int strset_base10();
 extern unsigned int strset_ubase10();
 
 extern void sig_catch();
+extern void sig_catch_save();
+extern void sig_catch_restore();
 extern void sig_default();
 extern void sig_setblock();
 extern void sig_block();

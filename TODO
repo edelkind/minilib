@@ -1,0 +1,2 @@
+add readyread() function to check fd read availability
+add readywrite() function to check fd write availability

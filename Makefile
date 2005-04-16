@@ -3,25 +3,27 @@ include ./Makefile.sets
 include ./Makefile.ready
 include ./Makefile.bin
 
-SRC             = getseg.c \
+SRC             = \
+                  blob.c \
                   die.c \
-                  setnum.c \
-                  strzero.c \
-                  strset_ulong.c \
-                  gather_input.c \
-                  getarg.c \
+                  diestatus.c \
                   dup_elem.c \
-                  is_numeric.c \
+                  exitstatus.c \
                   file_is_sticky.c \
-                  fork_pipefdout.c \
                   fork_passthru.c \
                   fork_passthru_wait.c \
+                  fork_pipefdout.c \
+                  gather_input.c \
                   get_sessionid.c \
-                  sig_catch.c \
+                  getarg.c \
+		  getseg.c \
+                  is_numeric.c \
+                  setnum.c \
                   sig_block.c \
+                  sig_catch.c \
                   sig_misc.c \
-                  exitstatus.c \
-                  diestatus.c \
+                  strset_ulong.c \
+                  strzero.c \
 
 OBJ             = $(SRC:.c=.o)
 LIB             = minilib.a

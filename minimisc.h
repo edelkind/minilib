@@ -1,7 +1,9 @@
 #ifndef INC_MINILIB_MINIMISC_H
 #define INC_MINILIB_MINIMISC_H
 
+#include "mltypes.h"
 #include "sig.h"
+#include "blob.h"
 #include "exitstatus.h"
 #include "diestatus.h"
 

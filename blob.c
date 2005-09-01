@@ -37,11 +37,12 @@ void *blob_new (hashsize, defaultdata)
     return bs;
 }
 
-int blob_register (bs, name, namesize, data)
+int blob_register (bs, name, namesize, data, destructor)
     blobset *bs;
     ub1_t *name;
     ub2_t namesize;
     void *data;
+    void (*destructor)(void *);
 {
     ub1_t slice = (blob_sum(name,namesize) % bs->elem);
     blobentry *entry = malloc (sizeof(blobentry)+namesize);
@@ -54,6 +55,7 @@ int blob_register (bs, name, namesize, data)
                   memcpy(entry->name, name, namesize);
     entry->data = data;
     entry->next = 0;
+    entry->destructor = destructor;
 
     target = &(bs->hash[slice]);
     while (*target)
@@ -63,6 +65,48 @@ int blob_register (bs, name, namesize, data)
 
     return 0;
 }
+
+int blob_unregister (bs, name, namesize)
+    blobset *bs;
+    ub1_t *name;
+    ub2_t namesize;
+{
+    ub1_t slice = (blob_sum(name,namesize) % bs->elem);
+    blobentry *entry = bs->hash[slice], *last = 0;
+
+    while (entry) {
+        if (entry->namesize == namesize && !memcmp(entry->name,name,namesize))
+        {
+            if (last) last->next = entry->next;
+            else bs->hash[slice] = entry->next;
+            if (entry->destructor) entry->destructor(entry->data);
+            free(entry);
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+void blob_destroy (bs)
+    blobset *bs;
+{
+    ub1_t slice = 0;
+    blobentry *entry, *next;
+
+    while (slice < bs->elem) {
+        next = bs->hash[slice++];
+        while (next) {
+            entry = next;
+            next = next->next;
+            if (entry->destructor) entry->destructor(entry->data);
+            free(entry);
+        }
+    }
+
+    free(bs);
+}
+
 
 /* XXX: optimize for 32-bit integers */
 void *blob_get (bs, name, namesize)

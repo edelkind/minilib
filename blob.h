@@ -5,6 +5,7 @@ typedef struct blobentry {
     ub1_t *name;
     ub2_t  namesize;
     void  *data;
+    void (*destructor)(void *);
     struct blobentry *next;
 } blobentry;
 
@@ -29,15 +30,60 @@ typedef struct {
 void *blob_new(ub1_t, void *);
 
 /***************************************************************************
-  ssh_blob_destroy
+  blob_destroy
   args:
-    blobset *blobset;
+    blobset *bs;
+    void (*freefunc)(void *)
 
-  not yet implemented.
+  destroys the entire blob set
+  frees all associated memory
+
+  Note that bs->dflt is never freed, and may be reused by the caller.
+
+  for every entry, if there is a destructor associated with the entry, it will
+  be called as described in blob_register().
  ***************************************************************************/
-void  blob_destroy(void *);
-int   blob_register(blobset *, ub1_t *, ub2_t, void *);
-void  blob_unregister();
+void  blob_destroy(blobset *);
+
+/***************************************************************************
+  blob_register
+  args:
+    blobset *bs;
+    ub1_t *name;
+    ub2_t namesize;
+    void *data;
+    void (*destructor)(void *);
+
+  registers the [data] in blobset [bs], with the associated [name] (of size
+  [namesize]) as the key.
+
+  If [destructor] is not 0, it will be called with [data] as an argument
+  whenever the associated blob entry is freed.  This may simply be 'free' if
+  [data] was allocated using malloc(3) and needs no further action before
+  destruction.
+
+  returns 0 on success
+  returns 1 on out-of-memory error
+ ***************************************************************************/
+int   blob_register(blobset *, ub1_t *, ub2_t, void *, void (*)(void *));
+
+/***************************************************************************
+  blob_unregister
+  args:
+    blobset *bs;
+    ub1_t *name;
+    ub2_t namesize;
+
+  finds the blob entry in [bs] associated with [name]/[namesize], removes it
+  from the hash, and frees the allocated memory.
+
+  if there is a destructor associated with the entry, it will be called as
+  described in blob_register().
+
+  returns 0 on success
+  returns 1 if the entry could not be found.
+ ***************************************************************************/
+int   blob_unregister (blobset *, ub1_t *, ub2_t);
 
 /***************************************************************************
   blob_get

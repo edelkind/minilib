@@ -10,9 +10,6 @@
 #define READ_ERROR  -1
 #define READ_EXCESS -2
 
-#define MAX_INPUT    512
-#define MAX_INPUTBUF 513  /* MAX_INPUT + 1 */
-
 #define SHELL "/bin/sh"
 
 #define RET_USAGE 255

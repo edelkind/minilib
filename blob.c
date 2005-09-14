@@ -83,6 +83,8 @@ int blob_unregister (bs, name, namesize)
             free(entry);
             return 0;
         }
+        last  = entry;
+        entry = entry->next;
     }
 
     return 1;

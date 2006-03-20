@@ -5,6 +5,7 @@ include ./Makefile.bin
 
 SRC             = \
                   blob.c \
+                  blobqueue.c \
                   die.c \
                   diestatus.c \
                   dup_elem.c \

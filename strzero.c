@@ -1,6 +1,9 @@
+#include <string.h>
 
+/*
 extern void *memset();
 extern int strlen();
+*/
 
 #if 0
 	*** strzero ***

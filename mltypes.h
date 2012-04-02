@@ -1,16 +1,18 @@
 #ifndef _MINILIB_MLTYPES_H
 #define _MINILIB_MLTYPES_H
 
-typedef unsigned char  ub1_t;
-typedef          char   b1_t;
+#include <stdint.h>
 
-typedef unsigned short ub2_t;
-typedef          short  b2_t;
+typedef uint8_t  ub1_t;
+typedef  int8_t   b1_t;
 
-typedef unsigned long  ub4_t;
-typedef          long   b4_t;
+typedef uint16_t ub2_t;
+typedef  int16_t  b2_t;
 
-typedef unsigned long long ub8_t;
-typedef          long long  b8_t;
+typedef uint32_t ub4_t;
+typedef  int32_t  b4_t;
+
+typedef uint64_t ub8_t;
+typedef  int64_t  b8_t;
 
 #endif /* _MINILIB_MLTYPES_H */

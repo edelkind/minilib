@@ -3,14 +3,28 @@
 #include "mltypes.h"
 #include "blob.h"
 
+#include <stdio.h>
+
 static inline ub4_t blob_sum(blob, len)
     void *blob;
     ub4_t len;
 {
     ub4_t sum = 0;
 
-    while (len >= 4)
-        { sum ^= *(ub4_t *)blob; len-=4; if (!len) return sum; blob+=4; }
+    while (len >= sizeof(sum))
+        {
+            sum ^= *(ub4_t *)blob;
+            len-=sizeof(sum);
+            if (!len) return sum;
+            blob+=sizeof(sum);
+        }
+
+    if (len >= 4) {
+        sum ^= *(unsigned int *)blob;
+        len -= 4;
+        /* if !len, the switch statement below will be a NOP */
+        blob += 4;
+    }
 
     switch (len) {
         case 2: sum ^= *(ub2_t *)blob;

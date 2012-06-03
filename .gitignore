@@ -1,0 +1,6 @@
+*.o
+*.a
+.*.sw?
+*BANNER
+compile.sh
+makelib.sh

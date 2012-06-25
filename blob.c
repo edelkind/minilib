@@ -4,6 +4,7 @@
 #include "blob.h"
 
 #include <stdio.h>
+#include <assert.h>
 
 static inline ub4_t blob_sum(blob, len)
     void *blob;
@@ -143,3 +144,108 @@ void *blob_get (bs, name, namesize)
     return bs->dflt;
 }
 
+void blob_cursor_init (
+        blobcursor *bc,
+        blobset *bs )
+{
+    bc->bs = bs;
+    bc->lastentry = 0;
+    bc->lastslice = -1;
+}
+
+static inline ub1_t
+_blob_entry_is_equal(blobentry *entry, ub1_t *name, ub2_t namesize)
+{
+        if (entry->namesize == namesize && !memcmp(entry->name,name,namesize))
+            return 1; /* true */
+        return 0;
+}
+
+static inline ub1_t
+_blob_find(blobset *bs, ub1_t *slicep, blobentry **entryp, ub1_t *name, ub2_t namesize)
+{
+    ub1_t slice = (blob_sum(name,namesize) % bs->elem);
+    blobentry *entry = bs->hash[slice];
+
+    while (entry) {
+        if (_blob_entry_is_equal(*entryp, name, namesize)) {
+            *slicep = slice;
+            *entryp = entry;
+            return 0;
+        }
+        entry = entry->next;
+    }
+    return 1;
+
+}
+
+void *blob_cursor_get (
+        blobcursor *bc,
+        ub1_t *name,
+        ub2_t namesize )
+{
+    ub1_t slice;
+    blobentry *entry;
+
+    if (!_blob_find(bc->bs, &slice, &entry, name, namesize)) {
+        bc->lastslice = slice;
+        bc->lastentry = entry;
+        return bc->lastentry->data;
+    }
+
+    return bc->bs->dflt;
+}
+
+ub1_t blob_cursor_find_first (
+        blobcursor *bc,
+        ub1_t *name,
+        ub2_t namesize,
+        void **data_out )
+{
+    ub1_t slice;
+    blobentry *entry;
+
+    if (!_blob_find(bc->bs, &slice, &entry, name, namesize)) {
+        bc->lastslice = slice;
+        bc->lastentry = entry;
+        if (data_out)
+            *data_out = bc->lastentry->data;
+        return 0;
+    }
+    return 1;
+}
+
+ub1_t blob_cursor_next (
+        blobcursor *bc,
+        void **data_out,
+        ub1_t **name_out,
+        ub2_t *namesize_out )
+{
+    blobset *bs = bc->bs;
+    blobentry *entry = bc->lastentry;
+    int slice = bc->lastslice;
+    int rv = 0;
+
+    if (entry)
+        entry = entry->next;
+
+    while (!entry) {
+        if (slice == ((int)bs->elem)-1) {
+            // not found
+            rv = 1;
+            goto OUT;
+        }
+        entry = bs->hash[++slice];
+        assert(slice < bs->elem);
+    }
+
+    // entry != null
+    *name_out = entry->name;
+    *namesize_out = entry->namesize;
+    *data_out = entry->data;
+
+OUT:
+    bc->lastslice = slice;
+    bc->lastentry = entry;
+    return rv;
+}

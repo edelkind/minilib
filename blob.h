@@ -15,6 +15,12 @@ typedef struct {
     void  *dflt;
 } blobset;
 
+typedef struct {
+    blobset *bs;
+    blobentry *lastentry;
+    int lastslice;
+} blobcursor;
+
 /***************************************************************************
   blob_new
   args:
@@ -94,5 +100,12 @@ int   blob_unregister (blobset *, ub1_t *, ub2_t);
  ***************************************************************************/
 
 void *blob_get(blobset *, ub1_t *, ub2_t);
+
+#if 0
+blob_cursor bc;
+blob_cursor_init(&bc);
+stuff = blob_cursor_get(&bc, &bs, name, namelen);
+stuff = blob_cursor_next(&bc, &name, &namelen);
+#endif
 
 #endif /* _MINILIB_BLOB_H */

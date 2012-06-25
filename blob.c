@@ -168,7 +168,7 @@ _blob_find(blobset *bs, ub1_t *slicep, blobentry **entryp, ub1_t *name, ub2_t na
     blobentry *entry = bs->hash[slice];
 
     while (entry) {
-        if (_blob_entry_is_equal(*entryp, name, namesize)) {
+        if (_blob_entry_is_equal(entry, name, namesize)) {
             *slicep = slice;
             *entryp = entry;
             return 0;
@@ -190,7 +190,7 @@ void *blob_cursor_get (
     if (!_blob_find(bc->bs, &slice, &entry, name, namesize)) {
         bc->lastslice = slice;
         bc->lastentry = entry;
-        return bc->lastentry->data;
+        return entry->data;
     }
 
     return bc->bs->dflt;

@@ -101,6 +101,13 @@ int   blob_unregister (blobset *, ub1_t *, ub2_t);
 
 void *blob_get(blobset *, ub1_t *, ub2_t);
 
+
+
+void blob_cursor_init(blobcursor *bc, blobset *bs);
+void *blob_cursor_get(blobcursor *bc, ub1_t *name, ub2_t namesize);
+ub1_t blob_cursor_find_first(blobcursor *bc, ub1_t *name, ub2_t namesize, void **data_out);
+ub1_t blob_cursor_next(blobcursor *bc, void **data_out, ub1_t **name_out, ub2_t *namesize_out);
+
 #if 0
 blob_cursor bc;
 blob_cursor_init(&bc);

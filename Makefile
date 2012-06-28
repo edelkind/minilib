@@ -29,6 +29,8 @@ SRC             = \
 OBJ             = $(SRC:.c=.o)
 LIB             = minilib.a
 
+#D_CFLAGS = -DNDEBUG
+
 CFLAGS         += $(D_CFLAGS)
 
 .c.o:

@@ -148,6 +148,8 @@ void blob_cursor_init (
         blobcursor *bc,
         blobset *bs )
 {
+    assert(bc);
+    assert(bs);
     bc->bs = bs;
     bc->lastentry = 0;
     bc->lastslice = -1;

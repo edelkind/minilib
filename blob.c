@@ -105,6 +105,28 @@ int blob_unregister (bs, name, namesize)
     return 1;
 }
 
+ub1_t blob_cursor_unregister (bc)
+    blobcursor *bc;
+{
+    blobentry *entry = bc->lastentry,
+              *last  = bc->lastref;
+    ub1_t slice = bc->lastslice;
+    blobset *bs = bc->bs;
+    ub1_t rv;
+
+    /* remove from list */
+    if (last) last->next = entry->next;
+    else bs->hash[slice] = entry->next;
+
+    /* then set cursor to next item */
+    rv = blob_cursor_next(bc, 0, 0, 0);
+
+    /* now destroy the entry */
+    if (entry->destructor) entry->destructor(entry->data);
+    free(entry);
+    return rv;
+}
+
 void blob_destroy (bs)
     blobset *bs;
 {
@@ -152,6 +174,7 @@ void blob_cursor_init (
     assert(bs);
     bc->bs = bs;
     bc->lastentry = 0;
+    bc->lastref = 0;
     bc->lastslice = -1;
 }
 
@@ -164,17 +187,25 @@ _blob_entry_is_equal(blobentry *entry, ub1_t *name, ub2_t namesize)
 }
 
 static inline ub1_t
-_blob_find(blobset *bs, ub1_t *slicep, blobentry **entryp, ub1_t *name, ub2_t namesize)
+_blob_find( blobset *bs,
+            ub1_t *slicep,
+            blobentry **entryp,
+            blobentry **erefp, /* eref->next == entry (or NULL) */
+            ub1_t *name,
+            ub2_t namesize)
 {
     ub1_t slice = (blob_sum(name,namesize) % bs->elem);
     blobentry *entry = bs->hash[slice];
+    blobentry *eref = 0;
 
     while (entry) {
         if (_blob_entry_is_equal(entry, name, namesize)) {
             *slicep = slice;
             *entryp = entry;
+            if (erefp) *erefp = eref;
             return 0;
         }
+        eref  = entry;
         entry = entry->next;
     }
     return 1;
@@ -187,11 +218,12 @@ void *blob_cursor_get (
         ub2_t namesize )
 {
     ub1_t slice;
-    blobentry *entry;
+    blobentry *entry, *eref;
 
-    if (!_blob_find(bc->bs, &slice, &entry, name, namesize)) {
+    if (!_blob_find(bc->bs, &slice, &entry, &eref, name, namesize)) {
         bc->lastslice = slice;
         bc->lastentry = entry;
+        bc->lastref   = eref;
         return entry->data;
     }
 
@@ -205,11 +237,12 @@ ub1_t blob_cursor_find_first (
         void **data_out )
 {
     ub1_t slice;
-    blobentry *entry;
+    blobentry *entry, *eref;
 
-    if (!_blob_find(bc->bs, &slice, &entry, name, namesize)) {
+    if (!_blob_find(bc->bs, &slice, &entry, &eref, name, namesize)) {
         bc->lastslice = slice;
         bc->lastentry = entry;
+        bc->lastref   = eref;
         if (data_out)
             *data_out = bc->lastentry->data;
         return 0;
@@ -224,30 +257,37 @@ ub1_t blob_cursor_next (
         ub2_t *namesize_out )
 {
     blobset *bs = bc->bs;
-    blobentry *entry = bc->lastentry;
+    blobentry *entry = bc->lastentry,
+              *eref;
     int slice = bc->lastslice;
     int rv = 0;
 
-    if (entry)
+    if (entry) {
+        eref  = entry;
         entry = entry->next;
+    }
 
-    while (!entry) {
-        if (slice == ((int)bs->elem)-1) {
-            // not found
-            rv = 1;
-            goto OUT;
-        }
-        entry = bs->hash[++slice];
-        assert(slice < bs->elem);
+    if (!entry) {
+        eref  = 0;
+        do {
+            if (slice == ((int)bs->elem)-1) {
+                // not found
+                rv = 1;
+                goto OUT;
+            }
+            entry = bs->hash[++slice];
+            assert(slice < bs->elem);
+        } while (!entry);
     }
 
     // entry != null
-    *name_out = entry->name;
-    *namesize_out = entry->namesize;
-    *data_out = entry->data;
+    if (data_out)     *data_out     = entry->data;
+    if (name_out)     *name_out     = entry->name;
+    if (namesize_out) *namesize_out = entry->namesize;
 
 OUT:
     bc->lastslice = slice;
     bc->lastentry = entry;
+    bc->lastref   = eref;
     return rv;
 }

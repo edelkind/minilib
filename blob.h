@@ -19,6 +19,7 @@ typedef struct {
     blobset *bs;
     blobentry *lastentry;
     int lastslice;
+    blobentry *lastref; /*< lastref->next == lastentry || 0 if first entry */
 } blobcursor;
 
 /***************************************************************************
@@ -103,16 +104,79 @@ void *blob_get(blobset *, ub1_t *, ub2_t);
 
 
 
+/****************************************************************************
+  blob_cursor_init
+  args:
+    blobcursor *bc;
+    blobset    *bs;
+
+  Initialize a cursor, and associate it with [bs].
+ ****************************************************************************/
 void blob_cursor_init(blobcursor *bc, blobset *bs);
 void *blob_cursor_get(blobcursor *bc, ub1_t *name, ub2_t namesize);
 ub1_t blob_cursor_find_first(blobcursor *bc, ub1_t *name, ub2_t namesize, void **data_out);
+
+/****************************************************************************
+  blob_cursor_next
+  args:
+    blobcursor *bc;
+    void      **data_out;
+    ub1_t     **name_out;
+    ub2_t      *namesize_out;
+
+  Position the cursor at the next entry.  If not null, the *_out variables
+  will be set to the new entry's data, name, and namesize, respectively.
+
+  returns 0 on success
+  returns 1 if there was no next entry (*_out variables remain unchanged).
+ ****************************************************************************/
 ub1_t blob_cursor_next(blobcursor *bc, void **data_out, ub1_t **name_out, ub2_t *namesize_out);
+
+/***************************************************************************
+  blob_cursor_unregister
+  args:
+    blobcursor *bc;
+
+  Unregister and destroy the entry currently referenced by the cursor, and if
+  possible, advance the cursor to the next entry in the blobset.
+
+  If bc is not currently set to a valid item, the behavior is undefined.
+
+  returns 0 if there is at least one more entry in the blobset
+  returns 1 if there are no more entries in the blobset
+ ***************************************************************************/
+ub1_t blob_cursor_unregister(blobcursor *bc);
+
+/****************************************************************************
+  blob_cursor_switcheroo
+  args:
+    blobcursor *bc;
+    void *data;
+
+  Switch out the data at the current cursor entry with [data].
+ ****************************************************************************/
+static inline void
+blob_cursor_switcheroo(blobcursor *bc, void *data)
+{ bc->lastentry->data = data; }
+
+/****************************************************************************
+  blob_cursor_value
+  args:
+    blobcursor *bc;
+
+  Return the data for the entry currently referenced by the cursor.
+ ****************************************************************************/
+static inline void *
+blob_cursor_value(blobcursor *bc)
+{ return bc->lastentry->data; }
 
 #if 0
 blob_cursor bc;
-blob_cursor_init(&bc);
-stuff = blob_cursor_get(&bc, &bs, name, namelen);
-stuff = blob_cursor_next(&bc, &name, &namelen);
+blob_cursor_init(&bc, &bs);
+stuff = blob_cursor_get(&bc, name, namelen);
+assert (stuff == blob_cursor_value(&bc));
+while (!blob_cursor_next(&bc, &stuff, &name, &namelen))
+    ...
 #endif
 
 #endif /* _MINILIB_BLOB_H */

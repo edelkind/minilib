@@ -25,6 +25,7 @@ SRC             = \
                   sig_misc.c \
                   strset_ulong.c \
                   strzero.c \
+                  utf8.c \
 
 OBJ             = $(SRC:.c=.o)
 LIB             = minilib.a

@@ -4,6 +4,7 @@
 #include "mltypes.h"
 #include "sig.h"
 #include "blob.h"
+#include "utf8.h"
 #include "exitstatus.h"
 #include "diestatus.h"
 

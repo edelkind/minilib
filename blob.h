@@ -72,7 +72,7 @@ void  blob_destroy(blobset *);
   returns 0 on success
   returns 1 on out-of-memory error
  ***************************************************************************/
-int   blob_register(blobset *, ub1_t *, ub2_t, void *, void (*)(void *));
+int   blob_register(blobset *, const ub1_t *, ub2_t, void *, void (*)(void *));
 
 /***************************************************************************
   blob_unregister
@@ -90,7 +90,7 @@ int   blob_register(blobset *, ub1_t *, ub2_t, void *, void (*)(void *));
   returns 0 on success
   returns 1 if the entry could not be found.
  ***************************************************************************/
-int   blob_unregister (blobset *, ub1_t *, ub2_t);
+int   blob_unregister (blobset *, const ub1_t *, ub2_t);
 
 /***************************************************************************
   blob_get
@@ -100,7 +100,7 @@ int   blob_unregister (blobset *, ub1_t *, ub2_t);
     uint32_t length;
  ***************************************************************************/
 
-void *blob_get(blobset *, ub1_t *, ub2_t);
+void *blob_get(blobset *, const ub1_t *, ub2_t);
 
 
 
@@ -113,8 +113,8 @@ void *blob_get(blobset *, ub1_t *, ub2_t);
   Initialize a cursor, and associate it with [bs].
  ****************************************************************************/
 void blob_cursor_init(blobcursor *bc, blobset *bs);
-void *blob_cursor_get(blobcursor *bc, ub1_t *name, ub2_t namesize);
-ub1_t blob_cursor_find_first(blobcursor *bc, ub1_t *name, ub2_t namesize, void **data_out);
+void *blob_cursor_get(blobcursor *bc, const ub1_t *name, ub2_t namesize);
+ub1_t blob_cursor_find_first(blobcursor *bc, const ub1_t *name, ub2_t namesize, void **data_out);
 
 /****************************************************************************
   blob_cursor_next

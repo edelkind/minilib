@@ -6,9 +6,8 @@
 #include <stdio.h>
 #include <assert.h>
 
-static inline ub4_t blob_sum(blob, len)
-    void *blob;
-    ub4_t len;
+static inline ub4_t
+blob_sum(const void *blob, ub4_t len)
 {
     ub4_t sum = 0;
 
@@ -37,9 +36,8 @@ static inline ub4_t blob_sum(blob, len)
     return sum;
 }
 
-void *blob_new (hashsize, defaultdata)
-    ub1_t hashsize;
-    void *defaultdata;
+void *
+blob_new (ub1_t hashsize, void *defaultdata)
 {
     blobset *bs = malloc (sizeof(blobset) + sizeof(blobentry *)*hashsize);
     if (!bs) return 0;
@@ -52,12 +50,12 @@ void *blob_new (hashsize, defaultdata)
     return bs;
 }
 
-int blob_register (bs, name, namesize, data, destructor)
-    blobset *bs;
-    ub1_t *name;
-    ub2_t namesize;
-    void *data;
-    void (*destructor)(void *);
+int
+blob_register (blobset *bs,
+               const ub1_t *name,
+               ub2_t namesize,
+               void *data,
+               void (*destructor)(void *))
 {
     ub1_t slice = (blob_sum(name,namesize) % bs->elem);
     blobentry *entry = malloc (sizeof(blobentry)+namesize);
@@ -81,10 +79,10 @@ int blob_register (bs, name, namesize, data, destructor)
     return 0;
 }
 
-int blob_unregister (bs, name, namesize)
-    blobset *bs;
-    ub1_t *name;
-    ub2_t namesize;
+int
+blob_unregister (blobset *bs,
+                 const ub1_t *name,
+                 ub2_t namesize)
 {
     ub1_t slice = (blob_sum(name,namesize) % bs->elem);
     blobentry *entry = bs->hash[slice], *last = 0;
@@ -105,8 +103,8 @@ int blob_unregister (bs, name, namesize)
     return 1;
 }
 
-ub1_t blob_cursor_unregister (bc)
-    blobcursor *bc;
+ub1_t
+blob_cursor_unregister (blobcursor *bc)
 {
     blobentry *entry = bc->lastentry,
               *last  = bc->lastref;
@@ -127,8 +125,7 @@ ub1_t blob_cursor_unregister (bc)
     return rv;
 }
 
-void blob_destroy (bs)
-    blobset *bs;
+void blob_destroy (blobset *bs)
 {
     ub1_t slice = 0;
     blobentry *entry, *next;
@@ -148,10 +145,9 @@ void blob_destroy (bs)
 
 
 /* XXX: optimize for 32-bit integers */
-void *blob_get (bs, name, namesize)
-    blobset *bs;
-    ub1_t *name;
-    ub2_t namesize;
+void *blob_get ( blobset *bs,
+                 const ub1_t *name,
+                 ub2_t namesize )
 {
     ub1_t slice = (blob_sum(name,namesize) % bs->elem);
     blobentry *entry = bs->hash[slice];
@@ -166,9 +162,8 @@ void *blob_get (bs, name, namesize)
     return bs->dflt;
 }
 
-void blob_cursor_init (
-        blobcursor *bc,
-        blobset *bs )
+void blob_cursor_init ( blobcursor *bc,
+                        blobset *bs )
 {
     assert(bc);
     assert(bs);
@@ -179,7 +174,7 @@ void blob_cursor_init (
 }
 
 static inline ub1_t
-_blob_entry_is_equal(blobentry *entry, ub1_t *name, ub2_t namesize)
+_blob_entry_is_equal(blobentry *entry, const ub1_t *name, ub2_t namesize)
 {
         if (entry->namesize == namesize && !memcmp(entry->name,name,namesize))
             return 1; /* true */
@@ -191,7 +186,7 @@ _blob_find( blobset *bs,
             ub1_t *slicep,
             blobentry **entryp,
             blobentry **erefp, /* eref->next == entry (or NULL) */
-            ub1_t *name,
+            const ub1_t *name,
             ub2_t namesize)
 {
     ub1_t slice = (blob_sum(name,namesize) % bs->elem);
@@ -212,10 +207,9 @@ _blob_find( blobset *bs,
 
 }
 
-void *blob_cursor_get (
-        blobcursor *bc,
-        ub1_t *name,
-        ub2_t namesize )
+void *blob_cursor_get ( blobcursor *bc,
+                        const ub1_t *name,
+                        ub2_t namesize )
 {
     ub1_t slice;
     blobentry *entry, *eref;
@@ -232,7 +226,7 @@ void *blob_cursor_get (
 
 ub1_t blob_cursor_find_first (
         blobcursor *bc,
-        ub1_t *name,
+        const ub1_t *name,
         ub2_t namesize,
         void **data_out )
 {

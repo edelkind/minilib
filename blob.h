@@ -100,7 +100,7 @@ int   blob_unregister (blobset *, const ub1_t *, ub2_t);
     uint32_t length;
  ***************************************************************************/
 
-void *blob_get(blobset *, const ub1_t *, ub2_t);
+void *blob_get(blobset* bs, const ub1_t* name, ub2_t namesize);
 
 
 

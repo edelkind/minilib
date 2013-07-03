@@ -3,7 +3,9 @@
 *.o
 *.a
 .*.sw?
+*.kate-sw?
 *BANNER
 compile.sh
 makelib.sh
 tags
+*.kdev*

@@ -2,10 +2,12 @@
 !*.*
 *.o
 *.a
+*.so
 .*.sw?
 *.kate-sw?
 *BANNER
 compile.sh
 makelib.sh
+makesolib.sh
 tags
 *.kdev*

@@ -37,18 +37,32 @@ typedef struct {
 void *blob_new(ub1_t, void *);
 
 /***************************************************************************
+  blob_empty
+  args:
+    blobset *bs;
+
+  destroys all entries in the blob set
+  frees all memory held by entries, but does not destroy/free the blobset
+  itself.
+
+  Note that bs->dflt is never freed, and may be reused by the caller.
+
+  for every entry, if there is a destructor associated with the entry, it will
+  be called as described in blob_register().
+ ***************************************************************************/
+void  blob_empty(blobset *);
+
+/***************************************************************************
   blob_destroy
   args:
     blobset *bs;
-    void (*freefunc)(void *)
 
   destroys the entire blob set
   frees all associated memory
 
   Note that bs->dflt is never freed, and may be reused by the caller.
 
-  for every entry, if there is a destructor associated with the entry, it will
-  be called as described in blob_register().
+  \see blob_empty()
  ***************************************************************************/
 void  blob_destroy(blobset *);
 

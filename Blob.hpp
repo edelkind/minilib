@@ -71,6 +71,9 @@ struct BlobSet
     
     inline T get(const char *s, ub2_t len)
     { return get((const ub1_t*)s, len); }
+
+    inline void empty()
+    { blob_empty(bs); }
     
 };
 

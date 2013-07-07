@@ -125,21 +125,26 @@ blob_cursor_unregister (blobcursor *bc)
     return rv;
 }
 
-void blob_destroy (blobset *bs)
+void blob_empty (blobset *bs)
 {
     ub1_t slice = 0;
     blobentry *entry, *next;
 
     while (slice < bs->elem) {
-        next = bs->hash[slice++];
+        next = bs->hash[slice];
         while (next) {
             entry = next;
             next = next->next;
             if (entry->destructor) entry->destructor(entry->data);
             free(entry);
         }
+        bs->hash[slice++] = 0;
     }
+}
 
+void blob_destroy (blobset *bs)
+{
+    blob_empty(bs);
     free(bs);
 }
 

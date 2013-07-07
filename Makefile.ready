@@ -1,10 +1,10 @@
 
 ### READY FOR COMPILING ###
 
-ready: READYBANNER compile.sh load.sh
+ready: READYBANNER compile.sh load.sh makelib.sh makesolib.sh
 
 readyclean:
-	rm -f READYBANNER compile.sh load.sh makelib.sh
+	rm -f READYBANNER compile.sh load.sh makelib.sh makesolib.sh
 
 reready: readyclean ready
 
@@ -30,5 +30,11 @@ makelib.sh:
 	echo 'lib="$$1"; shift' >>$@
 	echo '$(AR) "$$lib" $${1+"$$@"} $(LDFLAGS)' >>$@
 	echo 'exec $(RANLIB) "$$lib"' >>$@
+	chmod 755 $@
+
+makesolib.sh:
+	echo '#!/bin/sh' >$@
+	echo 'lib="$$1"; shift' >>$@
+	echo '$(CC) -o "$$lib" $${1+"$$@"} -shared $(LDFLAGS)' >>$@
 	chmod 755 $@
 

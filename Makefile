@@ -29,28 +29,35 @@ SRC             = \
 
 OBJ             = $(SRC:.c=.o)
 LIB             = minilib.a
+SOLIB           = minilib.so
 
 #D_CFLAGS = -DNDEBUG
 
-CFLAGS         += $(D_CFLAGS)
+CFLAGS         += $(D_CFLAGS) -fPIC
 
 .c.o:
 	./compile.sh $<
 	
 all: lib
 
-ready-local: READYBANNER compile.sh makelib.sh
+ready-local: READYBANNER compile.sh makelib.sh makesolib.sh
 
-lib: ready-local $(LIB) lib$(LIB)
+lib: ready-local $(SOLIB) $(LIB) lib$(SOLIB) lib$(LIB)
 
 $(LIB): BINBANNER $(OBJ)
 	./makelib.sh $@ $(OBJ)
-#	$(AR) $@ $(OBJ)
-#	$(RANLIB) $@
+
+$(SOLIB): BINBANNER $(OBJ)
+	./makesolib.sh $@ $(OBJ)
 
 lib$(LIB): $(LIB)
 	rm -f $@
 	ln -s $(LIB) $@
+
+lib$(SOLIB): $(SOLIB)
+	rm -f $@
+	ln -s $(SOLIB) $@
+
 
 relib: lean libclean lib
 
@@ -62,7 +69,7 @@ lean:
 	rm -f core $(OBJ)
 
 libclean:
-	rm -f BINBANNER $(LIB) lib$(LIB)
+	rm -f BINBANNER $(LIB) lib$(LIB) $(SOLIB) lib$(SOLIB)
 
 clean: lean libclean readyclean
 

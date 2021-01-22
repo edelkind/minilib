@@ -159,7 +159,7 @@ void *blob_get ( blobset *bs,
 
     while (entry) {
 //        printf ("comparing: %lu/%lu, %d/%d\n", *(ub4_t *)entry->name, *(ub4_t *)name, (int)entry->namesize, (int)namesize);
-        if (entry->namesize == namesize && !memcmp(entry->name,name,namesize))
+        if (entry->namesize == namesize && !memcmp(entry->name,name,(size_t)namesize))
             return entry->data;
         entry = entry->next;
     }

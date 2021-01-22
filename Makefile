@@ -33,7 +33,7 @@ SOLIB           = minilib.so
 
 #D_CFLAGS = -DNDEBUG
 
-CFLAGS         += $(D_CFLAGS) -fPIC
+CFLAGS         += $(D_CFLAGS) -fPIC -Wno-misleading-indentation -Werror
 
 .c.o:
 	./compile.sh $<

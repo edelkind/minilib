@@ -1,3 +1,5 @@
+#include <string.h>
+
 #if 0
 	*** process ***
 	get information from stdin and process that information

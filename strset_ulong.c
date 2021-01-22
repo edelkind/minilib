@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "minimisc.h"
 
 #if 0

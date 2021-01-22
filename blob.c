@@ -52,7 +52,7 @@ blob_new (ub1_t hashsize, void *defaultdata)
 
 int
 blob_register (blobset *bs,
-               const ub1_t *name,
+               const char *name,
                ub2_t namesize,
                void *data,
                void (*destructor)(void *))
@@ -64,8 +64,9 @@ blob_register (blobset *bs,
     if (!entry) return 1;
 
     entry->namesize = namesize;
-    entry->name = (ub1_t *)entry + sizeof(blobentry);
-                  memcpy(entry->name, name, namesize);
+    entry->name = (char *)entry + sizeof(blobentry);
+    memcpy(entry->name, name, namesize);
+
     entry->data = data;
     entry->next = 0;
     entry->destructor = destructor;
@@ -81,7 +82,7 @@ blob_register (blobset *bs,
 
 int
 blob_unregister (blobset *bs,
-                 const ub1_t *name,
+                 const char *name,
                  ub2_t namesize)
 {
     ub1_t slice = (blob_sum(name,namesize) % bs->elem);
@@ -151,7 +152,7 @@ void blob_destroy (blobset *bs)
 
 /* XXX: optimize for 32-bit integers */
 void *blob_get ( blobset *bs,
-                 const ub1_t *name,
+                 const char *name,
                  ub2_t namesize )
 {
     ub1_t slice = (blob_sum(name,namesize) % bs->elem);
@@ -179,7 +180,7 @@ void blob_cursor_init ( blobcursor *bc,
 }
 
 static inline ub1_t
-_blob_entry_is_equal(blobentry *entry, const ub1_t *name, ub2_t namesize)
+_blob_entry_is_equal(blobentry *entry, const char *name, ub2_t namesize)
 {
         if (entry->namesize == namesize && !memcmp(entry->name,name,namesize))
             return 1; /* true */
@@ -191,7 +192,7 @@ _blob_find( blobset *bs,
             ub1_t *slicep,
             blobentry **entryp,
             blobentry **erefp, /* eref->next == entry (or NULL) */
-            const ub1_t *name,
+            const char *name,
             ub2_t namesize)
 {
     ub1_t slice = (blob_sum(name,namesize) % bs->elem);
@@ -213,7 +214,7 @@ _blob_find( blobset *bs,
 }
 
 void *blob_cursor_get ( blobcursor *bc,
-                        const ub1_t *name,
+                        const char *name,
                         ub2_t namesize )
 {
     ub1_t slice;
@@ -231,7 +232,7 @@ void *blob_cursor_get ( blobcursor *bc,
 
 ub1_t blob_cursor_find_first (
         blobcursor *bc,
-        const ub1_t *name,
+        const char *name,
         ub2_t namesize,
         void **data_out )
 {
@@ -252,7 +253,7 @@ ub1_t blob_cursor_find_first (
 ub1_t blob_cursor_next (
         blobcursor *bc,
         void **data_out,
-        ub1_t **name_out,
+        char **name_out,
         ub2_t *namesize_out )
 {
     blobset *bs = bc->bs;
@@ -289,4 +290,5 @@ OUT:
     bc->lastentry = entry;
     bc->lastref   = eref;
     return rv;
+
 }

@@ -4,7 +4,10 @@
 #include <string.h>
 #include <errno.h>
 
-void die (int exitno, char *fmt, ...)
+#include "minimisc.h"
+
+void
+die(int exitno, char *fmt, ...)
 {
 
 #ifdef DEBUG
@@ -31,7 +34,8 @@ void die (int exitno, char *fmt, ...)
 	_exit (exitno);
 }
 
-void die_err (int exitno, char *fmt, ...)
+void
+die_err(int exitno, char *fmt, ...)
 {
 
 #ifdef DEBUG
@@ -58,7 +62,8 @@ void die_err (int exitno, char *fmt, ...)
 	_exit (exitno);
 }
 
-void warn (char *fmt, ...)
+void
+warn(char *fmt, ...)
 {
 
 #ifdef DEBUG
@@ -80,7 +85,8 @@ void warn (char *fmt, ...)
 
 }
 
-void warn_err (char *fmt, ...)
+void
+warn_err(char *fmt, ...)
 {
 
 #ifdef DEBUG

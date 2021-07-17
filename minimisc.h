@@ -21,10 +21,10 @@ extern void *getseg ();
 
 extern int gather_input();
 
-extern void die();
-extern void warn();
-extern void die_err();
-extern void warn_err();
+extern void die(int exitno, char *fmt, ...);
+extern void warn(char *fmt, ...);
+extern void die_err(int exitno, char *fmt, ...);
+extern void warn_err(char *fmt, ...);
 extern void setnum();
 extern void strzero();
 
@@ -33,13 +33,13 @@ extern unsigned int strset_ulong();
 extern unsigned int strset_base10();
 extern unsigned int strset_ubase10();
 
-extern void sig_catch();
-extern void sig_catch_save();
-extern void sig_catch_restore();
-extern void sig_default();
-extern void sig_setblock();
-extern void sig_block();
-extern void sig_unblock();
+extern void sig_catch(int signal, void (*func)(int));
+extern void sig_catch_save(int signal, void (*func)(int), void *oact);
+extern void sig_catch_restore(int signal, void *oact);
+extern void sig_default(int signal);
+extern void sig_setblock(int how, int signal);
+extern void sig_block(int signal);
+extern void sig_unblock(int signal);
 
 extern char is_numeric();
 extern char is_base10();

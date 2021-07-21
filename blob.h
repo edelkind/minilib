@@ -1,11 +1,13 @@
 #ifndef _MINILIB_BLOB_H
 #define _MINILIB_BLOB_H
 
+typedef void (*blob_destructor_fn_t)(void *);
+
 typedef struct blobentry {
     char *name;
     ub2_t  namesize;
     void  *data;
-    void (*destructor)(void *);
+    blob_destructor_fn_t destructor;
     struct blobentry *next;
 } blobentry;
 

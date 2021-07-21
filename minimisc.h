@@ -21,6 +21,10 @@ extern void *getseg ();
 
 extern int gather_input();
 
+#ifndef MINIMISC_ERROR_PRINT
+# define MINIMISC_ERROR_PRINT 1
+#endif
+
 extern void die(int exitno, char *fmt, ...);
 extern void warn(char *fmt, ...);
 extern void die_err(int exitno, char *fmt, ...);

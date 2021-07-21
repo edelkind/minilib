@@ -6,16 +6,19 @@
 
 #include "minimisc.h"
 
+/* NOTE: If you want to disable all error message output,
+ * compile with -DMINIMISC_ERROR_PRINT=0
+ */
+
 void
 die(int exitno, char *fmt, ...)
 {
 
-#ifdef DEBUG
+#if MINIMISC_ERROR_PRINT
 	if (fmt) {
 		va_list ap;
 
 		fflush(stdout);
-		fflush(stderr);
 
 		va_start (ap, fmt);
 		fprintf  (stderr, "exit code %d", exitno);
@@ -38,12 +41,11 @@ void
 die_err(int exitno, char *fmt, ...)
 {
 
-#ifdef DEBUG
+#if MINIMISC_ERROR_PRINT
 	if (fmt) {
 		va_list ap;
 
 		fflush(stdout);
-		fflush(stderr);
 
 		va_start (ap, fmt);
 		fprintf  (stderr, "exit code %d", exitno);
@@ -66,12 +68,11 @@ void
 warn(char *fmt, ...)
 {
 
-#ifdef DEBUG
+#if MINIMISC_ERROR_PRINT
 	if (fmt) {
 		va_list ap;
 
 		fflush(stdout);
-		fflush(stderr);
 
 		va_start (ap, fmt);
 		fprintf  (stderr, "warning: ");
@@ -89,12 +90,11 @@ void
 warn_err(char *fmt, ...)
 {
 
-#ifdef DEBUG
+#if MINIMISC_ERROR_PRINT
 	if (fmt) {
 		va_list ap;
 
 		fflush(stdout);
-		fflush(stderr);
 
 		va_start (ap, fmt);
 		fprintf  (stderr, "warning: ");
